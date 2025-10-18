@@ -77,7 +77,7 @@
 
   <!-- Page 1 -->
   <div class="swoc-page hidden" id="page-1">
-    <h3>Page 1: Self Reflection as a Daughter, Son</h3>
+    <h3>Page 1: Self Reflection as a Daughter, Son. Minimum 12 words </h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Patience – I listen calmly when my mother repeats the same story because it makes her feel heard and valued.</label>
@@ -105,7 +105,7 @@
 
   <!-- Page 2 -->
   <div class="swoc-page hidden" id="page-2">
-    <h3>Page 2: Self Reflection as a Friend</h3>
+    <h3>Page 2: Self Reflection as a Friend. Minimum 12 words</h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Loyalty – I stand by my friends during difficult times and never reveal their personal matters to others.</label>
@@ -133,7 +133,7 @@
 
   <!-- Page 3 -->
   <div class="swoc-page hidden" id="page-3">
-    <h3>Page 3: Self Reflection as a Classmate</h3>
+    <h3>Page 3: Self Reflection as a Classmate. Minimum 12 words</h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Cooperation – I willingly share notes and help classmates who miss lessons so everyone can stay on track.</label>
@@ -161,7 +161,7 @@
 
   <!-- Page 4 -->
   <div class="swoc-page hidden" id="page-4">
-    <h3>Page 4: Self Reflection as a Student</h3>
+    <h3>Page 4: Self Reflection as a Student. Minimum 12 words</h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Curiosity – I enjoy asking questions in class and exploring topics beyond the textbook to understand concepts deeply.</label>
@@ -189,7 +189,7 @@
 
   <!-- Page 5 -->
   <div class="swoc-page hidden" id="page-5">
-    <h3>Page 5: Self Reflection as a Youngster</h3>
+    <h3>Page 5: Self Reflection as a Youngster. Minimum 12 words</h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Enthusiasm – I approach new activities with energy and curiosity, eager to learn and explore.</label>
@@ -217,7 +217,7 @@
 
   <!-- Page 6 -->
   <div class="swoc-page hidden" id="page-6">
-    <h3>Page 6: Self Reflection as a Social Being</h3>
+    <h3>Page 6: Self Reflection as a Social Being. Minimum 12 words</h3>
     <div class="swoc-container">
       <div class="swoc-box">
         <label>Strength and Reason: e.g., Empathy – I try to understand the feelings of others in my community and offer support when needed.</label>
@@ -269,7 +269,7 @@ function startTimer() {
 function stopTimer(){if(timerInterval){clearInterval(timerInterval); timerInterval=null;}}
 
 // SWOC Next button validation
-function setupValidation(pageNum, minWords = 5){
+function setupValidation(pageNum, minWords = 12){
   const inputs = document.querySelectorAll(`#page-${pageNum} textarea`);
   const nextBtn = document.getElementById(`next${pageNum}`);
   inputs.forEach(input => {
