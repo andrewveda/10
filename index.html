@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dialogue Builder 🎭</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .bg-circles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 20s infinite ease-in-out;
+  }
+
+  .circle:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    left: 10%;
+    animation-duration: 25s;
+  }
+
+  .circle:nth-child(2) {
+    width: 120px;
+    height: 120px;
+    right: 15%;
+    top: 20%;
+    animation-duration: 30s;
+    animation-delay: 2s;
+  }
+
+  .circle:nth-child(3) {
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 60%;
+    animation-duration: 20s;
+    animation-delay: 4s;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+      opacity: 0.3;
+    }
+    25% {
+      transform: translateY(-100px) translateX(50px);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(-200px) translateX(-50px);
+      opacity: 0.3;
+    }
+    75% {
+      transform: translateY(-100px) translateX(100px);
+      opacity: 0.5;
+    }
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    text-align: center;
+    color: #764ba2;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .setting-display {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-style: italic;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .timer-display {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 20px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+  }
+
+  .paste-counter {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 20px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f5576c;
+  }
+
+  .progress-bar {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 20px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .progress-text {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .progress-track {
+    background: #e0e0e0;
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+  }
+
+  .dialogue-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dialogue-box {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .dialogue-box.left {
+    margin-right: 100px;
+  }
+
+  .dialogue-box.right {
+    margin-left: 100px;
+  }
+
+  .dialogue-number {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .character-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px 10px 20px;
+    gap: 10px;
+  }
+
+  .character-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .character-badge.char2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .dialogue-textarea {
+    width: 100%;
+    border: none;
+    padding: 10px 20px 20px 20px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    min-height: 80px;
+  }
+
+  .dialogue-textarea:focus {
+    outline: none;
+  }
+
+  .dialogue-textarea::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  .add-more-btn {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    width: 100%;
+    margin-top: 10px;
+    padding: 16px;
+    font-size: 1.1rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .action-buttons button {
+    flex: 1;
+  }
+
+  .scorecard {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 40px;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .scorecard h3 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #667eea;
+    text-align: center;
+  }
+
+  .scorecard p {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+
+  .validation-msg {
+    color: #f5576c;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 5px;
+    }
+
+    .form-container {
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    .dialogue-box.left,
+    .dialogue-box.right {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="bg-circles">
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="circle"></div>
+</div>
+
+<div class="container">
+  <!-- Initial Form -->
+  <div id="initialForm" class="form-container">
+    <h1>SRM Valliammai Engineering College</h1>
+    <h2>Dialogue Builder - Create Your Story</h2>
+
+    <div class="form-group">
+      <label for="studentName">👤 Your Name:</label>
+      <input type="text" id="studentName" placeholder="Enter your name">
+      <div id="nameError" class="validation-msg hidden">Please enter your name</div>
+    </div>
+
+    <div class="form-group">
+      <label for="department">🏫 Department:</label>
+      <select id="department">
+        <option value="">-- Select Department --</option>
+        <option value="Cyber Security">Cyber Security</option>
+        <option value="CSE-1">CSE-1</option>
+        <option value="CSE-2">CSE-2</option>
+        <option value="CSE-3">CSE-3</option>
+        <option value="Mechanical Engineering">Mechanical Engineering</option>
+        <option value="ECE-1">ECE-1</option>
+        <option value="ECE-2">ECE-2</option>
+        <option value="ECE-3">ECE-3</option>
+        <option value="AI DS-1">AI DS-1</option>
+        <option value="AI DS-2">AI DS-2</option>
+        <option value="Civil">Civil</option>
+        <option value="Agri">Agri</option>
+        <option value="EEE">EEE</option>
+        <option value="EIE">EIE</option>
+        <option value="Medical Electronics">Medical Electronics</option>
+        <option value="IT-1">IT-1</option>
+        <option value="IT-2">IT-2</option>
+      </select>
+      <div id="deptError" class="validation-msg hidden">Please select your department</div>
+    </div>
+
+    <div class="form-group">
+      <label for="character1">🎭 First Character Name:</label>
+      <input type="text" id="character1" placeholder="e.g., Sherlock Holmes">
+      <div id="char1Error" class="validation-msg hidden">Please enter first character name</div>
+    </div>
+
+    <div class="form-group">
+      <label for="character2">🎭 Second Character Name:</label>
+      <input type="text" id="character2" placeholder="e.g., Dr. Watson">
+      <div id="char2Error" class="validation-msg hidden">Please enter second character name</div>
+    </div>
+
+    <div class="form-group">
+      <label for="setting">📍 Setting/Place of Conversation:</label>
+      <input type="text" id="setting" placeholder="e.g., A cozy coffee shop in London">
+      <div id="settingError" class="validation-msg hidden">Please enter the setting</div>
+    </div>
+
+    <button onclick="startDialogue()">Begin Writing Dialogue 🚀</button>
+  </div>
+
+  <!-- Dialogue Section -->
+  <div id="dialogueSection" class="hidden">
+    <div class="setting-display" id="settingDisplay"></div>
+    
+    <div class="timer-display" id="timerDisplay">⏱️ Time: 0m 0s</div>
+    
+    <div class="paste-counter" id="pasteCounter">🚫 Copy/Paste Attempts: 0</div>
+    
+    <div class="progress-bar">
+      <div class="progress-text" id="progressText">Completed: 0 of 20 required dialogues</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="dialogue-container" id="dialogueContainer"></div>
+
+    <button onclick="addMoreDialogue()" class="add-more-btn">Add More Dialogue ➕</button>
+
+    <div class="action-buttons">
+      <button onclick="finishDialogue()">Finish & Submit 🎬</button>
+    </div>
+
+    <div id="submitError" class="validation-msg hidden" style="text-align: center; margin-top: 10px; font-size: 1rem;"></div>
+  </div>
+
+  <!-- Scorecard -->
+  <div id="scorecard" class="hidden scorecard">
+    <h3>📊 Submission Summary</h3>
+    <div id="scorecardContent"></div>
+    <div class="action-buttons">
+      <button onclick="downloadPDF()" class="btn-success">Download PDF 📄</button>
+      <button onclick="resetForm()" class="btn-secondary">Create New Dialogue 🔄</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let studentName = "";
+let department = "";
+let character1 = "";
+let character2 = "";
+let setting = "";
+let dialogueCount = 0;
+const MIN_DIALOGUES = 20;
+let startTime = 0;
+let timerInterval = null;
+let pasteAttempts = 0;
+
+// Disable all copy/paste/cut operations globally
+document.addEventListener('copy', function(e) {
+  e.preventDefault();
+  pasteAttempts++;
+  updatePasteCounter();
+  return false;
+});
+
+document.addEventListener('paste', function(e) {
+  e.preventDefault();
+  pasteAttempts++;
+  updatePasteCounter();
+  return false;
+});
+
+document.addEventListener('cut', function(e) {
+  e.preventDefault();
+  pasteAttempts++;
+  updatePasteCounter();
+  return false;
+});
+
+// Disable context menu (right-click)
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// Disable keyboard shortcuts for copy/paste/cut
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'a')) {
+    e.preventDefault();
+    if (e.key === 'v' || e.key === 'c' || e.key === 'x') {
+      pasteAttempts++;
+      updatePasteCounter();
+    }
+    return false;
+  }
+});
+
+function updatePasteCounter() {
+  const counter = document.getElementById("pasteCounter");
+  if (counter) {
+    counter.innerText = `🚫 Copy/Paste Attempts: ${pasteAttempts}`;
+  }
+}
+
+function startDialogue() {
+  studentName = document.getElementById("studentName").value.trim();
+  department = document.getElementById("department").value;
+  character1 = document.getElementById("character1").value.trim();
+  character2 = document.getElementById("character2").value.trim();
+  setting = document.getElementById("setting").value.trim();
+
+  let isValid = true;
+
+  if (!studentName) {
+    document.getElementById("nameError").classList.remove("hidden");
+    isValid = false;
+  } else {
+    document.getElementById("nameError").classList.add("hidden");
+  }
+
+  if (!department) {
+    document.getElementById("deptError").classList.remove("hidden");
+    isValid = false;
+  } else {
+    document.getElementById("deptError").classList.add("hidden");
+  }
+
+  if (!character1) {
+    document.getElementById("char1Error").classList.remove("hidden");
+    isValid = false;
+  } else {
+    document.getElementById("char1Error").classList.add("hidden");
+  }
+
+  if (!character2) {
+    document.getElementById("char2Error").classList.remove("hidden");
+    isValid = false;
+  } else {
+    document.getElementById("char2Error").classList.add("hidden");
+  }
+
+  if (!setting) {
+    document.getElementById("settingError").classList.remove("hidden");
+    isValid = false;
+  } else {
+    document.getElementById("settingError").classList.add("hidden");
+  }
+
+  if (!isValid) return;
+
+  document.getElementById("initialForm").classList.add("hidden");
+  document.getElementById("dialogueSection").classList.remove("hidden");
+  document.getElementById("settingDisplay").innerText = `📍 Setting: ${setting}`;
+  
+  startTime = Date.now();
+  startTimer();
+  
+  for (let i = 0; i < MIN_DIALOGUES; i++) {
+    addDialogueBox(i);
+  }
+  
+  updateProgress();
+}
+
+function addDialogueBox(index) {
+  const container = document.getElementById("dialogueContainer");
+  const isLeft = index % 2 === 0;
+  const character = isLeft ? character1 : character2;
+  const charClass = isLeft ? 'char1' : 'char2';
+  
+  const dialogueBox = document.createElement("div");
+  dialogueBox.className = `dialogue-box ${isLeft ? 'left' : 'right'}`;
+  dialogueBox.innerHTML = `
+    <div class="dialogue-number">Dialogue ${index + 1}</div>
+    <div class="character-header">
+      <div class="character-badge ${charClass}">${character}</div>
+    </div>
+    <textarea 
+      class="dialogue-textarea" 
+      id="dialogue-${index}" 
+      placeholder="Enter ${character}'s dialogue..."
+      oninput="handleTextInput(this, event); autoResize(this); updateProgress();"
+      onpaste="return false;"
+      oncopy="return false;"
+      oncut="return false;"
+      ondrop="return false;"
+      autocomplete="off"
+      spellcheck="false"
+    ></textarea>
+  `;
+  
+  container.appendChild(dialogueBox);
+  dialogueCount++;
+  
+  // Add additional paste prevention on the textarea itself
+  const textarea = document.getElementById(`dialogue-${index}`);
+  textarea.addEventListener('paste', function(e) {
+    e.preventDefault();
+    pasteAttempts++;
+    updatePasteCounter();
+    return false;
+  });
+}
+
+function handleTextInput(textarea, event) {
+  // Check if input length is suspiciously long (more than 10 characters at once)
+  if (event && event.inputType === 'insertFromPaste') {
+    event.preventDefault();
+    pasteAttempts++;
+    updatePasteCounter();
+    textarea.value = textarea.value.substring(0, textarea.value.length - 10);
+    return false;
+  }
+  
+  // Additional check for rapid text input
+  const currentValue = textarea.value;
+  if (!textarea.lastValue) {
+    textarea.lastValue = '';
+    textarea.lastInputTime = Date.now();
+  }
+  
+  const inputDiff = currentValue.length - textarea.lastValue.length;
+  const timeDiff = Date.now() - textarea.lastInputTime;
+  
+  // If more than 10 characters added in less than 100ms, likely paste
+  if (inputDiff > 10 && timeDiff < 100) {
+    pasteAttempts++;
+    updatePasteCounter();
+    textarea.value = textarea.lastValue;
+    return false;
+  }
+  
+  textarea.lastValue = currentValue;
+  textarea.lastInputTime = Date.now();
+}
+
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.max(80, textarea.scrollHeight) + 'px';
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    document.getElementById("timerDisplay").innerText = `⏱️ Time: ${minutes}m ${seconds}s`;
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function addMoreDialogue() {
+  addDialogueBox(dialogueCount);
+  updateProgress();
+  
+  setTimeout(() => {
+    const newDialogue = document.getElementById(`dialogue-${dialogueCount - 1}`);
+    newDialogue.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    newDialogue.focus();
+  }, 100);
+}
+
+function updateProgress() {
+  let filledCount = 0;
+  for (let i = 0; i < dialogueCount; i++) {
+    const textarea = document.getElementById(`dialogue-${i}`);
+    if (textarea && textarea.value.trim()) {
+      filledCount++;
+    }
+  }
+  
+  const requiredFilled = Math.min(filledCount, MIN_DIALOGUES);
+  const percentage = (requiredFilled / MIN_DIALOGUES) * 100;
+  
+  document.getElementById("progressFill").style.width = percentage + "%";
+  document.getElementById("progressText").innerText = 
+    `Completed: ${requiredFilled} of ${MIN_DIALOGUES} required dialogues` +
+    (filledCount > MIN_DIALOGUES ? ` (+${filledCount - MIN_DIALOGUES} extra)` : '');
+}
+
+function finishDialogue() {
+  let allDialogues = [];
+  let emptyCount = 0;
+  
+  for (let i = 0; i < Math.min(dialogueCount, MIN_DIALOGUES); i++) {
+    const textarea = document.getElementById(`dialogue-${i}`);
+    if (!textarea.value.trim()) {
+      emptyCount++;
+    }
+  }
+  
+  if (emptyCount > 0) {
+    document.getElementById("submitError").classList.remove("hidden");
+    document.getElementById("submitError").innerText = 
+      `⚠️ Please complete all ${MIN_DIALOGUES} required dialogues. ${emptyCount} dialogue(s) are empty.`;
+    
+    for (let i = 0; i < dialogueCount; i++) {
+      const textarea = document.getElementById(`dialogue-${i}`);
+      if (!textarea.value.trim()) {
+        textarea.style.border = "2px solid #f5576c";
+      } else {
+        textarea.style.border = "none";
+      }
+    }
+    return;
+  }
+  
+  stopTimer();
+  const totalTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
+  
+  document.getElementById("submitError").classList.add("hidden");
+  
+  for (let i = 0; i < dialogueCount; i++) {
+    const textarea = document.getElementById(`dialogue-${i}`);
+    if (textarea && textarea.value.trim()) {
+      const isChar1 = i % 2 === 0;
+      allDialogues.push({
+        number: i + 1,
+        character: isChar1 ? character1 : character2,
+        text: textarea.value.trim()
+      });
+    }
+  }
+
+  const dialogueTexts = allDialogues.map(d => `${d.character}: ${d.text}`).join(" | ");
+
+  const payload = {
+    studentName: studentName,
+    correctCount: 25,
+    totalWrongGuesses: 0,
+    totalTime: totalTimeSeconds,
+    department: department,
+    highestStreak: "IPA 51",
+    answers: [dialogueTexts],
+    pasteAttempts: pasteAttempts
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbxA0lRkERWFt2cYfmm04IQioaG4-21k5VFF5CFKP30zyVaJXM5_27PL3v8JIZEweK3u/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  showScorecard(allDialogues, totalTimeSeconds);
+}
+
+function showScorecard(dialogues, totalTimeSeconds) {
+  document.getElementById("dialogueSection").classList.add("hidden");
+  document.getElementById("scorecard").classList.remove("hidden");
+  
+  const minutes = Math.floor(totalTimeSeconds / 60);
+  const seconds = totalTimeSeconds % 60;
+  
+  let content = `
+    <p>👤 <strong>Student:</strong> ${studentName}</p>
+    <p>🏫 <strong>Department:</strong> ${department}</p>
+    <p>🎭 <strong>Characters:</strong> ${character1} & ${character2}</p>
+    <p>📍 <strong>Setting:</strong> ${setting}</p>
+    <p>💬 <strong>Total Dialogue Lines:</strong> ${dialogues.length}</p>
+    <p>⏱️ <strong>Time Taken:</strong> ${minutes}m ${seconds}s</p>
+    <p>🚫 <strong>Copy/Paste Attempts:</strong> ${pasteAttempts}</p>
+    <p>✅ <strong>Status:</strong> Successfully submitted!</p>
+  `;
+  
+  document.getElementById("scorecardContent").innerHTML = content;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  let yPos = 20;
+
+  function cleanText(text) {
+    return text.replace(/[^\x20-\x7E]/g, '');
+  }
+
+  function addNewPageIfNeeded(requiredSpace) {
+    if (yPos + requiredSpace > pageHeight - 20) {
+      doc.addPage();
+      yPos = 20;
+      return true;
+    }
+    return false;
+  }
+
+  doc.setFillColor(102, 126, 234);
+  doc.rect(0, 0, pageWidth, 35, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Dialogue Script', pageWidth / 2, 22, { align: 'center' });
+
+  yPos = 50;
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Student: ${cleanText(studentName)}`, margin, yPos);
+  yPos += 6;
+  doc.text(`Department: ${cleanText(department)}`, margin, yPos);
+  yPos += 6;
+  doc.text(`Characters: ${cleanText(character1)} & ${cleanText(character2)}`, margin, yPos);
+  yPos += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.text(`Setting: ${cleanText(setting)}`, margin, yPos);
+  yPos += 15;
+
+  doc.setDrawColor(102, 126, 234);
+  doc.line(margin, yPos, pageWidth - margin, yPos);
+  yPos += 10;
+
+  for (let i = 0; i < dialogueCount; i++) {
+    const textarea = document.getElementById(`dialogue-${i}`);
+    if (textarea && textarea.value.trim()) {
+      const isChar1 = i % 2 === 0;
+      const character = isChar1 ? character1 : character2;
+      const dialogueText = cleanText(textarea.value.trim());
+      
+      addNewPageIfNeeded(30);
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(isChar1 ? 102 : 240, isChar1 ? 126 : 147, isChar1 ? 234 : 108);
+      doc.text(`${character}:`, margin, yPos);
+      yPos += 6;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(50, 50, 50);
+      const splitText = doc.splitTextToSize(dialogueText, pageWidth - 2 * margin - 5);
+      
+      splitText.forEach(line => {
+        if (addNewPageIfNeeded(6)) {
+          // Character name repeated on new page
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(isChar1 ? 102 : 240, isChar1 ? 126 : 147, isChar1 ? 234 : 108);
+          doc.text(`${character} (cont.):`, margin, yPos);
+          yPos += 6;
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(50, 50, 50);
+        }
+        doc.text(line, margin + 5, yPos);
+        yPos += 5;
+      });
+      
+      yPos += 8;
+    }
+  }
+
+  yPos = pageHeight - 15;
+  doc.setFillColor(102, 126, 234);
+  doc.rect(0, yPos, pageWidth, 15, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Created with Dialogue Builder - SRM Valliammai Engineering College', pageWidth / 2, yPos + 10, { align: 'center' });
+
+  doc.save(`${studentName}_Dialogue_Script.pdf`);
+}
+
+function resetForm() {
+  stopTimer();
+  document.getElementById("scorecard").classList.add("hidden");
+  document.getElementById("initialForm").classList.remove("hidden");
+  
+  document.getElementById("studentName").value = "";
+  document.getElementById("department").value = "";
+  document.getElementById("character1").value = "";
+  document.getElementById("character2").value = "";
+  document.getElementById("setting").value = "";
+  
+  dialogueCount = 0;
+  startTime = 0;
+  pasteAttempts = 0;
+  document.getElementById("dialogueContainer").innerHTML = "";
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
