@@ -20,15 +20,14 @@
   h2{text-align:center;color:#764ba2;margin-bottom:30px;font-size:1.5rem;font-weight:500;}
   .form-group{margin-bottom:25px;}
   label{display:block;margin-bottom:8px;color:#333;font-weight:600;font-size:1.1rem;}
-  input, select{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:1rem;transition:all 0.3s ease;background:white;}
-  input:focus, select:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);}
+  input, select, textarea{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:1rem;transition:all 0.3s ease;background:white;}
+  input:focus, select:focus, textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);}
   button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:14px 32px;border-radius:10px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;display:inline-block;margin-top:10px;}
   button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,0.4);}
   button:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
   .swoc-page{background:rgba(255,255,255,0.95);border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.2);margin-bottom:20px;}
   .swoc-container{display:flex;flex-direction:column;gap:15px;}
   .swoc-box label{display:block;margin-bottom:5px;font-weight:600;color:#333;}
-  .swoc-box input{padding:10px;border:2px solid #e0e0e0;border-radius:10px;}
   .hidden{display:none;}
   #timerDisplay{background:rgba(255,255,255,0.95);padding:15px 20px;border-radius:15px;margin-bottom:10px;box-shadow:0 4px 15px rgba(0,0,0,0.1);text-align:center;font-size:1.3rem;font-weight:700;color:#667eea;}
   @media(max-width:768px){.container{padding:5px;}.form-container{padding:20px;}h1{font-size:1.8rem;}h2{font-size:1.2rem;}}
@@ -68,7 +67,7 @@
         <option value="IT-2">IT-2</option>
       </select>
     </div>
-    <button onclick="startSWOC()">Begin Reflection 🚀</button>
+    <button id="startBtn" disabled onclick="startSWOC()">Begin Reflection 🚀</button>
   </div>
 
   <!-- SWOC Pages -->
@@ -245,7 +244,6 @@
   </div>
 </div>
 
-
   <!-- Scorecard -->
   <div id="scorecard" class="hidden">
     <h3>📊 Submission Summary</h3>
@@ -270,13 +268,13 @@ function startTimer() {
 }
 function stopTimer(){if(timerInterval){clearInterval(timerInterval); timerInterval=null;}}
 
-// Setup input validation for each page
-function setupValidation(pageNum){
-  const inputs = document.querySelectorAll(`#page-${pageNum} input`);
+// SWOC Next button validation
+function setupValidation(pageNum, minWords = 5){
+  const inputs = document.querySelectorAll(`#page-${pageNum} textarea`);
   const nextBtn = document.getElementById(`next${pageNum}`);
   inputs.forEach(input => {
     input.addEventListener('input', () => {
-      const allFilled = Array.from(inputs).every(i => i.value.trim() !== '');
+      const allFilled = Array.from(inputs).every(i => i.value.trim().split(/\s+/).length >= minWords);
       nextBtn.disabled = !allFilled;
     });
   });
@@ -316,27 +314,21 @@ function finishSWOC(){
       adjective:document.getElementById(`adjective-${p}`).value.trim()
     });
   }
-
-  // Send to Google Sheet
- // Convert each page's reflection into a string
-const reflectionsStr = data.map((p,i)=>{
-  return `Page ${i+1}: Strength: ${p.strength}, Weakness: ${p.weakness}, Opportunity: ${p.opportunity}, Challenge: ${p.challenge}, Adjective: ${p.adjective}`;
-});
-
-const payload = {
-  studentName,
- fixedC: 25,           // Column C
+  const reflectionsStr = data.map((p,i)=>{
+    return `Page ${i+1}: Strength: ${p.strength}, Weakness: ${p.weakness}, Opportunity: ${p.opportunity}, Challenge: ${p.challenge}, Adjective: ${p.adjective}`;
+  });
+  const payload = {
+    studentName,
+    fixedC: 25,
     fixedD: 0, 
-  totalTime: totalTimeSeconds, 
-  department, 
- fixedG: "ELLL 10", 
-  reflections: reflectionsStr
-};
+    totalTime: totalTimeSeconds, 
+    department, 
+    fixedG: "ELLL 10", 
+    reflections: reflectionsStr
+  };
   fetch("https://script.google.com/macros/s/AKfycbxA0lRkERWFt2cYfmm04IQioaG4-21k5VFF5CFKP30zyVaJXM5_27PL3v8JIZEweK3u/exec", {
     method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
   });
-
-  // Show scorecard
   document.getElementById("swocSection").classList.add("hidden");
   document.getElementById("scorecard").classList.remove("hidden");
   let content=`<p>👤 <strong>Student:</strong> ${studentName}</p><p>🏫 <strong>Department:</strong> ${department}</p>`;
@@ -372,6 +364,20 @@ function downloadPDF(){
 
 // Reset
 function resetForm(){location.reload();}
+
+// --- Name & Department validation ---
+const nameInput = document.getElementById("studentName");
+const deptSelect = document.getElementById("department");
+const startBtn = document.getElementById("startBtn");
+
+function validateInitialForm() {
+  const nameFilled = nameInput.value.trim() !== "";
+  const deptSelected = deptSelect.value !== "";
+  startBtn.disabled = !(nameFilled && deptSelected);
+}
+
+nameInput.addEventListener("input", validateInitialForm);
+deptSelect.addEventListener("change", validateInitialForm);
 </script>
 </body>
 </html>
