@@ -286,10 +286,6 @@ window.onload = () => {
   });
 };
 
-  // Block drag & drop
-  t.addEventListener("drop", e=>e.preventDefault());
-});
-
 // SWOC Next button validation
 function setupValidation(pageNum, minWords = 12){
   const inputs = document.querySelectorAll(`#page-${pageNum} textarea`);
