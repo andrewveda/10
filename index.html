@@ -255,7 +255,7 @@
   </div>
 </div>
 
-<script>
+ <script>
 let studentName="", department="", startTime=0, timerInterval=null, currentPage=1;
 
 // Timer
@@ -267,20 +267,25 @@ function startTimer() {
   },1000);
 }
 function stopTimer(){if(timerInterval){clearInterval(timerInterval); timerInterval=null;}}
-// --- Prevent Copy & Paste ---
 
- window.onload = () => {
+// --- Prevent Copy & Paste ---
+window.onload = () => {
   document.querySelectorAll("textarea").forEach(t=>{
-  // Block right-click copy/paste
-  t.addEventListener("copy", e=>e.preventDefault());
-  t.addEventListener("cut", e=>e.preventDefault());
-  t.addEventListener("paste", e=>e.preventDefault());
-  // Block Gboard long insertions
-  t.addEventListener("input", e=>{
-    if((e.data && e.data.length>10) || e.inputType==="insertFromPaste"){
-      e.target.value = e.target.value.slice(0, -e.data.length);
-    }
+    // Block right-click copy/paste
+    t.addEventListener("copy", e=>e.preventDefault());
+    t.addEventListener("cut", e=>e.preventDefault());
+    t.addEventListener("paste", e=>e.preventDefault());
+    // Block Gboard long insertions
+    t.addEventListener("input", e=>{
+      if((e.data && e.data.length>10) || e.inputType==="insertFromPaste"){
+        e.target.value = e.target.value.slice(0, -e.data.length);
+      }
+    });
+    // Block drag & drop
+    t.addEventListener("drop", e=>e.preventDefault());
   });
+};
+
   // Block drag & drop
   t.addEventListener("drop", e=>e.preventDefault());
 });
